@@ -1,180 +1,160 @@
-let energy = 100; 
-let courage = 20;
-let morality = 100;
-let money = 0;
-let health = 100;
-let healthCap = 100;
-const donateButton = document.getElementById('donate-menu');
-const healButton = document.getElementById('heal-menu');
-const shopButton = document.getElementById('shop-menu');
-const dmenu = document.getElementById('dmenu');
-const hmemu = document.getElementById('hmenu');
-const smenu = document.getElementById('smenu');
-donateButton.addEventListener('click', () => {
-  dmenu.style.display = dmenu.style.display === 'block' ? 'none' : 'block';
-});
-shopButton.addEventListener('click', () => {
-  smenu.style.display = smenu.style.display === 'block' ? 'none' : 'block';
-});
-healButton.addEventListener('click', () => {
-  hmenu.style.display = hmenu.style.display === 'block' ? 'none' : 'block';
-});
-function updateStats(){
-document.getElementById("health").innerHTML = `${health}/${healthCap}`;
-document.getElementById("morality").innerHTML = morality;
-document.getElementById("energy").innerHTML = energy;
-document.getElementById("courage").innerHTML = courage;
-document.getElementById("money").innerHTML = `$${money}`;
+const dbtn = document.getElementById('donate-menu'), hbtn = document.getElementById('heal-menu'), sbtn = document.getElementById('shop-menu'), dmenu = document.getElementById('dmenu'), hmenu = document.getElementById('hmenu'), smenu = document.getElementById('smenu'), ds = document.getElementById('ds'), dialog = document.getElementById('dialog'), hs = document.getElementById('hs');
+
+function toggleMenu(button, menu) {
+  button.addEventListener('click', () => {
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  });
 }
+toggleMenu(dbtn, dmenu),toggleMenu(sbtn, smenu),toggleMenu(hbtn, hmenu);
+
+function toggleAlert(button, dis) {
+  button.addEventListener('click', () => {
+  dialog.style.display = dis;
+})};
+toggleAlert(hs, 'none');
+toggleAlert(ds, 'block');
+
 function beg() {
-  if (energy < 5) {
-    alert("You don't have enough energy to beg!");
+  if (player.energy < 5) {
+    alert("You need at least 5 energy to beg.");
     return;
   }
-  if (money > 9001) {
+  const MAX_MONEY_FOR_BEGGING = 9001;
+  if (player.money > MAX_MONEY_FOR_BEGGING) {
     alert("You shouldn't be begging!");
     return;
   }
-  energy -= 5;
+  player.energy -= 5;
   let amount = Math.floor(Math.random() * 64) + 1;
-  money += amount;
+  player.money += amount;
   updateStats();
 }
+
 function fight() {
-  if (energy < 20 || courage < 1 || health < 11) {
-    alert("You need at least 20 energy, 1 courage and 10 health!");
+  const MIN_ENERGY_TO_FIGHT = 20 , MIN_COURAGE_TO_FIGHT = 1 , MIN_HEALTH_TO_FIGHT = 10;
+  if (player.energy < MIN_ENERGY_TO_FIGHT || player.courage < MIN_COURAGE_TO_FIGHT || player.health < MIN_HEALTH_TO_FIGHT) {
+    alert(`You need at least ${MIN_ENERGY_TO_FIGHT} energy, ${MIN_COURAGE_TO_FIGHT} courage, and ${MIN_HEALTH_TO_FIGHT} health to fight!`);
     return;
   }
-
-  energy -= 20; 
-  courage -= 1; 
-
-  let winChance = Math.random() < 0.8; 
+  player.energy -= MIN_ENERGY_TO_FIGHT;
+  player.courage -= MIN_COURAGE_TO_FIGHT;
+  const WIN_CHANCE = 0.8 , winChance = Math.random() < WIN_CHANCE;
   if (winChance) {
-    let amount = Math.floor(Math.random() * 666); 
-    money += amount; 
+    const MAX_MONEY_FROM_FIGHT = 666;
+    const amount = Math.floor(Math.random() * MAX_MONEY_FROM_FIGHT);
+    player.money += amount;
     alert(`You won the fight and earned $${amount}!`);
-updateStats();
-    let damageChance = Math.random() < 0.75; 
+    updateStats();
+    const DAMAGE_CHANCE = 0.75;
+    const damageChance = Math.random() < DAMAGE_CHANCE;
     if (damageChance) {
-      let damage = Math.floor(Math.random() * 44) + 1; 
-      health -= damage; 
-      if (health < 0) {
-        health = 1;
+      const MAX_DAMAGE_FROM_FIGHT = 44;
+      const damage = Math.floor(Math.random() * MAX_DAMAGE_FROM_FIGHT) + 1;
+      player.health -= damage;
+      if (player.health < 0) {
+        player.health = 1;
       }
-      alert(`You took ${damage} damage in the fight.`); 
-updateStats();
+      alert(`You took ${damage} damage in the fight.`);
+      updateStats();
     }
   } else {
-    let damage = Math.floor(Math.random() * 45) + 22;
-    health -= damage;
-    if (health < 10) {
-      health = 1; 
+    const MAX_DAMAGE_FROM_FIGHT = 45;
+    const MIN_DAMAGE_FROM_FIGHT = 22;
+    const damage = Math.floor(Math.random() * (MAX_DAMAGE_FROM_FIGHT - MIN_DAMAGE_FROM_FIGHT) + MIN_DAMAGE_FROM_FIGHT);
+    player.health -= damage;
+    if (player.health < MIN_HEALTH_TO_FIGHT) {
+      player.health = 1;
     }
     alert(`You lost the fight and took ${damage} damage.`);
     updateStats();
   }
 }
-function heal(heal) {
-  if (heal == 10){
-if (money < 100){
-  alert("You need medical fees of atleast $100");
-return;
-}
-if (health > 90){ 
-  alert("You Dont Need Health!");
-return;
-}
-  money-=100;
-  health+=10;
-  updateStats();
-} else if (heal == 20){
-  if(money < 190){
-alert("you need atleast $190!");
-return;
-}
-if (health > 80){
-alert("You Dont Need This Much Health!");
-return;
-}
-  money-=190;
-  health+=20;
-  updateStats();
-} else {
-if(money < 270){
-alert("you need atleast $270!");
-return;
-}
-if(health > 70){
-alert("You dont need this much health!");
-return;
-}
-  money-=270;
-  health+=30;
+function heal(healAmount) {
+  const HEALING_LEVELS = {
+    1: { cost: 100, amount: 10 },
+    2: { cost: 190, amount: 20 },
+    3: { cost: 270, amount: 30 }
+  };
+
+  const healingLevel = HEALING_LEVELS[healAmount];
+  if (!healingLevel) {
+    alert("Invalid healing level.");
+    return;
+  }
+
+  if (player.money < healingLevel.cost) {
+    alert(`You need at least $${healingLevel.cost} to heal.`);
+    return;
+  }
+  if (player.health == player.healthCap) {
+      alert("You are at max health.");
+      return;
+  }
+
+  player.money -= healingLevel.cost;
+  player.health += healingLevel.amount;
+  if (player.health > player.healthCap) {
+    player.health = player.healthCap;
+  }
   updateStats();
 }
+function rest() {
+  const MAX_ENERGY_TO_REST = 90;
+  if (player.energy > MAX_ENERGY_TO_REST) {
+    alert("You already have enough energy to rest.");
+    return;
+  }
+  const MIN_MORALITY_TO_REST = 5;
+  if (player.morality < MIN_MORALITY_TO_REST) {
+    alert("Your morality is too low to rest.");
+    return;
+  }
+  player.morality -= MIN_MORALITY_TO_REST;
+  player.energy += 10;
+  updateStats();
 }
-function rest(){
- if (energy > 90){
-alert("You don't need energy!");
-return;
-}
-if (morality < 5){
-alert("you neex atleast 5 moral to sleep at night");
-return;
-}
-morality-=5;
-energy+=10
-updateStats();
-}
-function train(addhealth){
-if (addhealth == 1){
-if(money < 1000){
-alert("You need atleast $1000 to increase your max health!");
-return;
-}
-healthCap+=1;
-alert(`Your max health is now ${healthCap}`);
-money-=1000;
-updateStats();
-} else if (addhealth == 2){
-if(money < 1900){
-alert("You need atleast $1900!");
-return;
-}
-healthCap+=2;
-alert(`Your max health is now ${healthCap}`);
-money-=1900;
-updateStats();
-} else {
-if (money < 2800){
-alert("You need atleast $2800!");
-return;
-}
-healthCap+=3;
-alert(`Your max health is now ${healthCap}`);
-money-=2800;
-updateStats();
-}
+
+function train(addHealth) {
+  const TRAINING_LEVELS = {
+    1: { cost: 1000, increase: 1 },
+    2: { cost: 1900, increase: 2 },
+    3: { cost: 2800, increase: 3 }
+  };
+
+  const trainingLevel = TRAINING_LEVELS[addHealth];
+  if (!trainingLevel) {
+    alert("Invalid training level.");
+    return;
+  }
+
+  if (player.money < trainingLevel.cost) {
+    alert(`You need at least $${trainingLevel.cost} to train.`);
+    return;
+  }
+
+  player.healthCap += trainingLevel.increase;
+  alert(`Your max health is now ${player.healthCap}.`);
+  player.money -= trainingLevel.cost;
+  updateStats();
 }
 function donate(amount){
-if (amount > money){
+if (amount > player.money){
 alert('not enough money!');
 return;
 }
-if (morality > 92){
+if (player.morality > 92){
 alert('You Do not need morality');
 return;
 }
-money-= amount;
+player.money-= amount;
 if (amount == 10){
-morality+= 2;
+player.morality+= 2;
 updateStats();
 } else if (amount == 20){
-morality+= 5;
+player.morality+= 5;
 updateStats();
 } else {
-morality+= 8
+player.morality+= 8
 updateStats();
 }
 }

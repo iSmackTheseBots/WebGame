@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width" />
 
   <title>Web Project</title>
-  <link rel="icon" href="img/favi.png">
+  <link rel="icon" href="img/favi.jpg">
 
-  <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body>
 <div class="stat">
@@ -17,7 +17,6 @@
   <div class="money" id="money">$0</div>
   <div class="health">Health: <span id="health">100/100</span></div>
 </div>
-
 <div class="bgrid">
   <button class="item" onclick="beg()">Beg</button>
   <button class="item" onclick="fight()">fight</button>
@@ -25,26 +24,36 @@
   <button class="item" id="donate-menu">Donate</button>
   <button class="item" id="shop-menu">Shop</button>
   <button class="item" id="heal-menu">Heal</button>
-</div>
-<div class="mgrid">
+  <a class="btn"href="wh.html"><button class="item">Inventory</button></a>
 <ul id="dmenu">
   <li onclick="donate(10)">Donate $10</li>
   <li onclick="donate(20)">Donate $20</li>
   <li onclick="donate(30)">Donate $30</li>
 </ul>
 <ul id="smenu">
-  <li onclick="train(1)">+1 Health Cap</li>
+  <li onclick="addToInventory(crowbar, 1)">[$5] Crowbar</li>
   <li onclick="train(2)">+2 Health Cap</li>
   <li onclick="train(3)">+3 Health Cap</li>
 </ul>
 
 <ul id="hmenu">
-  <li onclick="heal(10)">Heal 10</li>
-  <li onclick="heal(20)">Heal 20</li>
-  <li onclick="heal(30)">Heal 30</li>
+  <li onclick="heal(1)">Heal 10</li>
+  <li onclick="heal(2)">Heal 20</li>
+  <li onclick="heal(3)">Heal 30</li>
 </ul>
 </div>
+<button id="ds">Display Stats</button>
+
+<div id="dialog">
+  <div id="dialog-content">
+    <h2>Player Stats:</h2>
+    <p>Attack: W.I.P.</p>
+    <button id="hs">Hide Stats</button>
+  </div>
+</div>
 <div class="background"/>
+  <script src="player.js"></script>
   <script src="script.js"></script>
+  <script src="inv.js"></script>
 </body>
 </html>
